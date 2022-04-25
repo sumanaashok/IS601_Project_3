@@ -1,19 +1,27 @@
 import logging
 import os
 from logging.config import dictConfig
+import datetime
+import time
 
 import flask
-from flask import request, current_app
+from flask import request, current_app, g
 
-#from app.logging_config.log_formatters import RequestFormatter
+# from app.logging_config.log_formatters import RequestFormatter
+from rfc3339 import rfc3339
+
+import app
 from app import config
 
 log_con = flask.Blueprint('log_con', __name__)
 
 
-#@log_con.before_app_request
-#def before_request_logging():
+# @log_con.before_app_request
+# def before_request_logging():
 
+@log_con.before_request
+def start_timer():
+    g.start = time.time()
 
 
 @log_con.after_app_request
@@ -24,18 +32,45 @@ def after_request_logging(response):
         return response
     elif request.path.startswith('/bootstrap'):
         return response
+    current_app.logger.debug('Request')
+    #
+    # now = time.time()
+    # duration = round(now - g.start, 2)
+    # dt = datetime.datetime.fromtimestamp(now)
+    # timestamp = rfc3339(dt, utc=True)
+    # ip = request.headers.get('X-Forwarded-For', request.remote_addr)
+    # host = request.host.split(':', 1)[0]
+    # log_params = [
+    #     ('method', request.method),
+    #     ('path', request.path),
+    #     ('status', response.status_code),
+    #     ('duration', duration),
+    #     ('time', timestamp),
+    #     ('ip', ip),
+    #     ('host', host)
+    # ]
+    #
+    # request_id = request.headers.get('X-Request-ID')
+    # if request_id:
+    #     log_params.append(('request_id', request_id))
+    #
+    # parts = []
+    # for name, value in log_params:
+    #     part = name + ': ' + str(value) + ', '
+    #     parts.append(part)
+    # line = " ".join(parts)
+    # app.logger.info(line)
     return response
+
 
 @log_con.before_app_first_request
 def setup_logs():
-
     # set the name of the apps log folder to logs
     logdir = config.Config.LOG_DIR
     # make a directory if it doesn't exist
     if not os.path.exists(logdir):
         os.mkdir(logdir)
     logging.config.dictConfig(LOGGING_CONFIG)
-
 
 
 LOGGING_CONFIG = {
@@ -57,54 +92,54 @@ LOGGING_CONFIG = {
         'file.handler': {
             'class': 'logging.handlers.RotatingFileHandler',
             'formatter': 'standard',
-            'filename': os.path.join(config.Config.LOG_DIR,'handler.log'),
+            'filename': os.path.join(config.Config.LOG_DIR, 'handler.log'),
             'maxBytes': 10000000,
             'backupCount': 5,
         },
         'file.handler.myapp': {
             'class': 'logging.handlers.RotatingFileHandler',
             'formatter': 'standard',
-            'filename': os.path.join(config.Config.LOG_DIR,'myapp.log'),
+            'filename': os.path.join(config.Config.LOG_DIR, 'myapp.log'),
             'maxBytes': 10000000,
             'backupCount': 5,
         },
         'file.handler.request': {
             'class': 'logging.handlers.RotatingFileHandler',
             'formatter': 'standard',
-            'filename': os.path.join(config.Config.LOG_DIR,'request.log'),
+            'filename': os.path.join(config.Config.LOG_DIR, 'request.log'),
             'maxBytes': 10000000,
             'backupCount': 5,
         },
         'file.handler.errors': {
             'class': 'logging.handlers.RotatingFileHandler',
             'formatter': 'standard',
-            'filename': os.path.join(config.Config.LOG_DIR,'errors.log'),
+            'filename': os.path.join(config.Config.LOG_DIR, 'errors.log'),
             'maxBytes': 10000000,
             'backupCount': 5,
         },
         'file.handler.sqlalchemy': {
             'class': 'logging.handlers.RotatingFileHandler',
             'formatter': 'standard',
-            'filename': os.path.join(config.Config.LOG_DIR,'sqlalchemy.log'),
+            'filename': os.path.join(config.Config.LOG_DIR, 'sqlalchemy.log'),
             'maxBytes': 10000000,
             'backupCount': 5,
         },
         'file.handler.werkzeug': {
             'class': 'logging.handlers.RotatingFileHandler',
             'formatter': 'standard',
-            'filename': os.path.join(config.Config.LOG_DIR,'werkzeug.log'),
+            'filename': os.path.join(config.Config.LOG_DIR, 'werkzeug.log'),
             'maxBytes': 10000000,
             'backupCount': 5,
         },
     },
     'loggers': {
         '': {  # root logger
-            'handlers': ['default','file.handler'],
+            'handlers': ['default', 'file.handler'],
             'level': 'DEBUG',
             'propagate': True
         },
         '__main__': {  # if __name__ == '__main__'
-            'handlers': ['default','file.handler'],
+            'handlers': ['default', 'file.handler'],
             'level': 'DEBUG',
             'propagate': True
         },
