@@ -26,40 +26,39 @@ def start_timer():
 
 @log_con.after_app_request
 def after_request_logging(response):
+    log = logging.getLogger('request')
     if request.path == '/favicon.ico':
         return response
     elif request.path.startswith('/static'):
         return response
     elif request.path.startswith('/bootstrap'):
         return response
-    current_app.logger.debug('Request')
-    #
-    # now = time.time()
-    # duration = round(now - g.start, 2)
-    # dt = datetime.datetime.fromtimestamp(now)
-    # timestamp = rfc3339(dt, utc=True)
-    # ip = request.headers.get('X-Forwarded-For', request.remote_addr)
-    # host = request.host.split(':', 1)[0]
-    # log_params = [
-    #     ('method', request.method),
-    #     ('path', request.path),
-    #     ('status', response.status_code),
-    #     ('duration', duration),
-    #     ('time', timestamp),
-    #     ('ip', ip),
-    #     ('host', host)
-    # ]
-    #
-    # request_id = request.headers.get('X-Request-ID')
-    # if request_id:
-    #     log_params.append(('request_id', request_id))
-    #
-    # parts = []
-    # for name, value in log_params:
-    #     part = name + ': ' + str(value) + ', '
-    #     parts.append(part)
-    # line = " ".join(parts)
-    # app.logger.info(line)
+    log = logging.getLogger("request")
+
+    now = time.time()
+    dt = datetime.datetime.fromtimestamp(now)
+    timestamp = rfc3339(dt, utc=True)
+    ip = request.headers.get('X-Forwarded-For', request.remote_addr)
+
+    log_params = [
+        ('method', request.method),
+        ('path', request.path),
+        ('status', response.status_code),
+        ('time', timestamp),
+        ('ip', ip),
+    ]
+
+    request_id = request.headers.get('X-Request-ID')
+    if request_id:
+        log_params.append(('request_id', request_id))
+
+    parts = []
+    for name, value in log_params:
+        part = name + ': ' + str(value) + ', '
+        parts.append(part)
+    line = " ".join(parts)
+
+    log.info(line)
     return response
 
 
@@ -79,6 +78,9 @@ LOGGING_CONFIG = {
     'formatters': {
         'standard': {
             'format': '%(asctime)s [%(levelname)s] %(name)s: %(message)s'
+        },
+        'request_formatter': {
+            'format': '%(asctime)s [%(levelname)s] in %(module)s : %(message)s'
         },
 
     },
@@ -105,7 +107,7 @@ LOGGING_CONFIG = {
         },
         'file.handler.request': {
             'class': 'logging.handlers.RotatingFileHandler',
-            'formatter': 'standard',
+            'formatter': 'request_formatter',
             'filename': os.path.join(config.Config.LOG_DIR, 'request.log'),
             'maxBytes': 10000000,
             'backupCount': 5,
@@ -163,6 +165,10 @@ LOGGING_CONFIG = {
             'level': 'DEBUG',
             'propagate': False
         },
-
+        'request': {  # if __name__ == '__main__'
+                'handlers': ['file.handler.request'],
+                'level': 'DEBUG',
+                'propagate': False
+            },
     }
 }

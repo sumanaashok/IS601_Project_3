@@ -59,7 +59,8 @@ def create_app():
     "methods": ["OPTIONS", "GET", "POST"],
     }
     CORS(app, resources={"/api/*": api_v1_cors_config})
-    app.logger.debug('Request')
+    # log = logging.getLogger("request")
+    # log.info('request')
     # Run once at startup:
     return app
 
