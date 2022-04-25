@@ -7,7 +7,7 @@ import time
 import flask
 from flask import request, current_app, g
 
-from app.logging_config.log_formatters import RequestFormatter
+# from app.logging_config.log_formatters import RequestFormatter
 from rfc3339 import rfc3339
 
 import app
