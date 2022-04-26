@@ -10,6 +10,7 @@ from app.db import db
 from app.db.models import Song
 from app.songs.forms import csv_upload
 from werkzeug.utils import secure_filename, redirect
+from app.auth import auth
 
 
 
@@ -48,7 +49,7 @@ def songs_upload():
         current_user.songs = list_of_songs
         db.session.commit()
 
-        return redirect(url_for('songs.songs_browse'))
+        return redirect(url_for('auth.dashboard'))
 
     try:
         return render_template('upload.html', form=form)
