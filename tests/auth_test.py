@@ -1,6 +1,5 @@
 """This test the homepage"""
 
-from flask import url_for
 
 
 def test_request_main_menu_links(client):
@@ -20,50 +19,3 @@ def test_auth_pages(client):
     response = client.get("/login")
     assert response.status_code == 200
 
-
-def test_register_and_login(client):
-    with client:
-        register_response = client.post("/register", data={
-            "email": "testuser1@test.com",
-            "password": "test123!test",
-            "confirm": "test123!test"
-        },
-                                        follow_redirects=True)
-
-        assert register_response.status_code == 200
-        assert register_response.request.path == url_for('auth.login')
-
-        login_response = client.post("/login", data={
-            "email": "testuser1@test.com",
-            "password": "test123!test"
-        },
-                                     follow_redirects=True)
-        assert login_response.request.path == url_for('auth.dashboard')
-        assert login_response.status_code == 200
-
-
-def test_dashboard_access(client):
-    with client:
-        register_response = client.post("/register", data={
-            "email": "testuser1@test.com",
-            "password": "test123!test",
-            "confirm": "test123!test"
-        },
-                                        follow_redirects=True)
-
-        login_response = client.post("/login", data={
-            "email": "testuser1@test.com",
-            "password": "test123!test"
-        }, follow_redirects=True)
-        assert login_response.request.path == url_for('auth.dashboard')
-        assert login_response.status_code == 200
-
-
-def test_dashboard_access_denied(client):
-    with client:
-        login_response = client.post("/login", data={
-            "email": "testuser1@test.com",
-            "password": "test1233!test"
-        },  follow_redirects=True)
-        assert login_response.request.path == url_for('auth.login')
-        assert login_response.status_code == 200

@@ -1,3 +1,4 @@
+import flask
 from flask import Blueprint, render_template, redirect, url_for, flash,current_app, abort
 from flask_login import login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash
@@ -70,16 +71,17 @@ def logout():
 # def dashboard():
 #     return render_template('dashboard.html')
 
+
 @auth.route('/dashboard', methods=['GET'], defaults={"page": 1})
 @auth.route('/dashboard/<int:page>', methods=['GET'])
 @login_required
 def dashboard(page):
     page = page
     per_page = 1000
-    pagination = Song.query.paginate(page, per_page, error_out=False)
+    pagination = Song.query.filter_by(user_id=current_user.id).paginate(page, per_page, error_out=False)
     data = pagination.items
     try:
-        return render_template('browse_songs.html',data=data,pagination=pagination)
+        return render_template('dashboard.html', data=data, pagination=pagination)
     except TemplateNotFound:
         abort(404)
 
@@ -110,9 +112,6 @@ def edit_account():
         return redirect(url_for('auth.dashboard'))
     return render_template('manage_account.html', form=form)
 
-
-
-#You should probably move these to a new Blueprint to clean this up.  These functions below are for user management
 
 @auth.route('/users')
 @login_required

@@ -28,6 +28,7 @@ def browse_locations(page):
     except TemplateNotFound:
         abort(404)
 
+
 @map.route('/locations_datatables/', methods=['GET'])
 def browse_locations_datatables():
 
@@ -37,6 +38,7 @@ def browse_locations_datatables():
         return render_template('browse_locations_datatables.html',data=data)
     except TemplateNotFound:
         abort(404)
+
 
 @map.route('/api/locations/', methods=['GET'])
 def api_locations():
@@ -56,7 +58,6 @@ def map_locations():
         return render_template('map_locations.html',google_api_key=google_api_key)
     except TemplateNotFound:
         abort(404)
-
 
 
 @map.route('/locations/upload', methods=['POST', 'GET'])

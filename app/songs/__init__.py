@@ -19,13 +19,25 @@ songs = Blueprint('songs', __name__,
 
 @songs.route('/songs', methods=['GET'], defaults={"page": 1})
 @songs.route('/songs/<int:page>', methods=['GET'])
+@login_required
 def songs_browse(page):
     page = page
     per_page = 1000
-    pagination = Song.query.paginate(page, per_page, error_out=False)
+    pagination = Song.query.filter_by(user_id=current_user.id).paginate(page, per_page, error_out=False)
     data = pagination.items
     try:
         return render_template('browse_songs.html',data=data,pagination=pagination)
+    except TemplateNotFound:
+        abort(404)
+
+
+@songs.route('/songs_datatables/', methods=['GET'])
+def browse_locations_datatables():
+
+    data = Song.query.all()
+
+    try:
+        return render_template('browse_songs_datatables.html',data=data)
     except TemplateNotFound:
         abort(404)
 
@@ -34,12 +46,12 @@ def songs_browse(page):
 def songs_upload():
     form = csv_upload()
     if form.validate_on_submit():
-        log = logging.getLogger("myApp")
-        log.info('upload successful')
+        log = logging.getLogger("uploads")
+        log.info('csv upload successful!')
         filename = secure_filename(form.file.data.filename)
         filepath = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
         form.file.data.save(filepath)
-        #user = current_user
+        # user = current_user
         list_of_songs = []
         with open(filepath) as file:
             csv_file = csv.DictReader(file)
@@ -49,7 +61,7 @@ def songs_upload():
         current_user.songs = list_of_songs
         db.session.commit()
 
-        return redirect(url_for('auth.dashboard'))
+        return redirect(url_for('songs.songs_browse'))
 
     try:
         return render_template('upload.html', form=form)

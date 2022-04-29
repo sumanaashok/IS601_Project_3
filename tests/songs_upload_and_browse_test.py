@@ -45,3 +45,6 @@ def test_songs_csv_upload(client):
         assert browse_songs_response.status_code == 200
         assert header_content in browse_songs_response.data
         assert songs_content in browse_songs_response.data
+
+# def test_song_upload_denied(client):
+#     with client:
