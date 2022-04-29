@@ -33,6 +33,7 @@ def after_request_logging(response):
         return response
     elif request.path.startswith('/bootstrap'):
         return response
+    # writing a log message for each request and response into the request.log file
     log = logging.getLogger("request")
 
     now = time.time()
