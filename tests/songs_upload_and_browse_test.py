@@ -1,3 +1,5 @@
+from flask import url_for
+
 from app.db.models import User, Song
 
 
@@ -45,3 +47,15 @@ def test_songs_csv_upload(client):
         assert browse_songs_response.status_code == 200
         assert header_content in browse_songs_response.data
         assert songs_content in browse_songs_response.data
+
+
+def test_songs_csv_upload_access_denied(client):
+    """This tests the csv file upload denial"""
+    with client:
+        # checking if access to songs upload page without login is redirecting to login page
+        response = client.get("/songs/upload")
+        assert response.status_code == 302
+        # checking if the redirect is working properly
+        response_following_redirects = client.get("/songs/upload", follow_redirects=True)
+        assert response_following_redirects.request.path == url_for('auth.login')
+        assert response_following_redirects.status_code == 200

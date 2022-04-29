@@ -33,6 +33,7 @@ def after_request_logging(response):
         return response
     elif request.path.startswith('/bootstrap'):
         return response
+    # writing a log message for each request and response into the request.log file
     log = logging.getLogger("request")
 
     now = time.time()
@@ -133,6 +134,13 @@ LOGGING_CONFIG = {
             'maxBytes': 10000000,
             'backupCount': 5,
         },
+        'file.handler.uploads': {
+            'class': 'logging.handlers.RotatingFileHandler',
+            'formatter': 'standard',
+            'filename': os.path.join(config.Config.LOG_DIR, 'uploads.log'),
+            'maxBytes': 10000000,
+            'backupCount': 5,
+        },
     },
     'loggers': {
         '': {  # root logger
@@ -167,6 +175,11 @@ LOGGING_CONFIG = {
         },
         'request': {  # if __name__ == '__main__'
                 'handlers': ['file.handler.request'],
+                'level': 'DEBUG',
+                'propagate': False
+            },
+        'uploads': {  # if __name__ == '__main__'
+                'handlers': ['file.handler.uploads'],
                 'level': 'DEBUG',
                 'propagate': False
             },
