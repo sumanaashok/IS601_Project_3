@@ -26,7 +26,6 @@ def start_timer():
 
 @log_con.after_app_request
 def after_request_logging(response):
-    log = logging.getLogger('request')
     if request.path == '/favicon.ico':
         return response
     elif request.path.startswith('/static'):
