@@ -9,3 +9,9 @@
 
 * [Developmental Deployment](https://sumana-dev.herokuapp.com/)
 
+
+
+## Running Locally
+
+To Build with docker compose , run the below command in the terminal.s
+docker compose up --build

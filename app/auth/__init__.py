@@ -1,5 +1,5 @@
 import flask
-from flask import Blueprint, render_template, redirect, url_for, flash,current_app, abort
+from flask import Blueprint, render_template, redirect, url_for, flash, current_app, abort
 from flask_login import login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash
 from jinja2 import TemplateNotFound
@@ -34,6 +34,7 @@ def register():
             return redirect(url_for('auth.login'), 302)
     return render_template('register.html', form=form)
 
+
 @auth.route('/login', methods=['POST', 'GET'])
 def login():
     form = login_form()
@@ -53,6 +54,7 @@ def login():
             return redirect(url_for('auth.dashboard'))
     return render_template('login.html', form=form)
 
+
 @auth.route("/logout")
 @login_required
 def logout():
@@ -65,13 +67,10 @@ def logout():
     return redirect(url_for('auth.login'))
 
 
-
 # @auth.route('/dashboard')
 # @login_required
 # def dashboard():
 #     return render_template('dashboard.html')
-
-
 @auth.route('/dashboard', methods=['GET'], defaults={"page": 1})
 @auth.route('/dashboard/<int:page>', methods=['GET'])
 @login_required
@@ -182,8 +181,3 @@ def delete_user(user_id):
     db.session.commit()
     flash('User Deleted', 'success')
     return redirect(url_for('auth.browse_users'), 302)
-
-
-
-
-
