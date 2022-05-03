@@ -13,5 +13,5 @@
 
 ## Running Locally
 
-To Build with docker compose , run the below command in the terminal.s
-docker compose up --build
+To Build with docker compose , run the below command in the terminal.
+#### docker compose up --build
