@@ -30,14 +30,14 @@ def songs_browse(page):
         abort(404)
 
 
-@songs.route('/songs_datatables/', methods=['GET'])
-def browse_locations_datatables():
-    data = Song.query.all()
+# @songs.route('/songs_datatables/', methods=['GET'])
+# def browse_locations_datatables():
+#     data = Song.query.all()
 
-    try:
-        return render_template('browse_songs_datatables.html', data=data)
-    except TemplateNotFound:
-        abort(404)
+#     try:
+#         return render_template('browse_songs_datatables.html', data=data)
+#     except TemplateNotFound:
+#         abort(404)
 
 
 @songs.route('/songs/upload', methods=['POST', 'GET'])
